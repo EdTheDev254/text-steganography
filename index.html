@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invisible Text Steganography</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        /* Custom Scrollbar for Textareas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #1d4ed8;
+            background-color: white;
+        }
+        
+        .tab-inactive {
+            border-bottom: 3px solid transparent;
+            color: #64748b;
+        }
+        .tab-inactive:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white w-full max-w-2xl rounded-xl shadow-lg overflow-hidden flex flex-col h-[700px] md:h-auto">
+        
+        <!-- Header -->
+        <div class="bg-slate-50 border-b border-slate-200 p-6">
+            <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                Invisible Text Steganography
+            </h1>
+            <p class="text-slate-500 text-sm mt-1">Hide secret messages inside normal text using zero-width characters.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 bg-slate-50">
+            <button onclick="switchTab('hide')" id="tab-btn-hide" class="flex-1 py-4 text-center font-semibold transition-all duration-200 tab-active">
+                Hide Message
+            </button>
+            <button onclick="switchTab('reveal')" id="tab-btn-reveal" class="flex-1 py-4 text-center font-semibold transition-all duration-200 tab-inactive">
+                Reveal Message
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-6 md:p-8 flex-grow">
+            
+            <!-- HIDE TAB -->
+            <div id="tab-hide" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">1. Secret Message (Emojis supported)</label>
+                    <input type="text" id="secret" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="e.g., The meeting is at midnight 🦉">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">2. Cover Text (Visible to everyone)</label>
+                    <input type="text" id="cover" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="e.g., Hey, how are you doing?">
+                </div>
+
+                <button onclick="hideMessage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Hide Message Inside Text
+                </button>
+
+                <div class="relative">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Result</label>
+                    <textarea id="hide-output" readonly class="w-full h-24 px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 text-slate-600 focus:outline-none resize-none font-sans" placeholder="Generated text will appear here..."></textarea>
+                    
+                    <button onclick="copyToClipboard()" class="mt-3 w-full border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        Copy Result
+                    </button>
+                </div>
+            </div>
+
+            <!-- REVEAL TAB -->
+            <div id="tab-reveal" class="hidden space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Paste text containing hidden message</label>
+                    <textarea id="reveal-input" class="w-full h-32 px-4 py-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none" placeholder="Paste the suspicious text here..."></textarea>
+                </div>
+
+                <button onclick="revealMessage()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Reveal Hidden Message
+                </button>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Hidden Message Found</label>
+                    <div id="reveal-output-container" class="w-full min-h-[80px] px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center">
+                        <span id="reveal-output" class="text-emerald-800 font-medium italic">Waiting for input...</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2 z-50">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span id="toast-msg">Copied to clipboard!</span>
+    </div>
+
+<script>
+    // --- Constants matching Python Logic ---
+    const ZW_ZERO = '\u200b';   // Zero Width Space
+    const ZW_ONE = '\u200c';    // Zero Width Non-Joiner
+    const ZW_JOINER = '\u200d'; // Zero Width Joiner
+
+    // --- Tab Switching Logic ---
+    function switchTab(tabName) {
+        const hideTab = document.getElementById('tab-hide');
+        const revealTab = document.getElementById('tab-reveal');
+        const hideBtn = document.getElementById('tab-btn-hide');
+        const revealBtn = document.getElementById('tab-btn-reveal');
+
+        if (tabName === 'hide') {
+            hideTab.classList.remove('hidden');
+            revealTab.classList.add('hidden');
+            
+            hideBtn.classList.add('tab-active');
+            hideBtn.classList.remove('tab-inactive');
+            revealBtn.classList.add('tab-inactive');
+            revealBtn.classList.remove('tab-active');
+        } else {
+            hideTab.classList.add('hidden');
+            revealTab.classList.remove('hidden');
+
+            hideBtn.classList.add('tab-inactive');
+            hideBtn.classList.remove('tab-active');
+            revealBtn.classList.add('tab-active');
+            revealBtn.classList.remove('tab-inactive');
+        }
+    }
+
+    // --- Core Steganography Logic ---
+
+    // Equivalent to Python's str.encode('utf-8') then to binary
+    function strToBinary(text) {
+        const encoder = new TextEncoder();
+        const uint8Array = encoder.encode(text);
+        let binaryString = "";
+        
+        for (let byte of uint8Array) {
+            // Convert byte to 8-bit binary string
+            binaryString += byte.toString(2).padStart(8, '0');
+        }
+        return binaryString;
+    }
+
+    // Equivalent to Python's converting binary back to utf-8 bytes
+    function binaryToStr(binaryStr) {
+        try {
+            const byteArray = [];
+            // Split into 8-bit chunks
+            for (let i = 0; i < binaryStr.length; i += 8) {
+                const byteChunk = binaryStr.substring(i, i + 8);
+                if (byteChunk.length === 8) {
+                    byteArray.push(parseInt(byteChunk, 2));
+                }
+            }
+            
+            const uint8Array = new Uint8Array(byteArray);
+            const decoder = new TextDecoder();
+            return decoder.decode(uint8Array);
+        } catch (e) {
+            console.error(e);
+            return "Error decoding text.";
+        }
+    }
+
+    function hideMessage() {
+        const secret = document.getElementById('secret').value;
+        const cover = document.getElementById('cover').value;
+
+        if (!secret || !cover) {
+            showToast("Please enter both secret and cover text!", true);
+            return;
+        }
+
+        // 1. Convert secret to binary (UTF-8 safe)
+        const binarySecret = strToBinary(secret);
+
+        // 2. Convert to Zero-Width Chars
+        let hiddenPayload = "";
+        for (let bit of binarySecret) {
+            if (bit === '0') {
+                hiddenPayload += ZW_ZERO;
+            } else {
+                hiddenPayload += ZW_ONE;
+            }
+        }
+
+        // 3. Inject: [JOINER] + [PAYLOAD] + [JOINER]
+        const fullStego = ZW_JOINER + hiddenPayload + ZW_JOINER;
+
+        let finalText = "";
+        // Python Logic: final_text = cover[:1] + full_stego + cover[1:]
+        // We inject after the first character so it's harder to spot by accidental deletion at start
+        if (cover.length > 0) {
+            finalText = cover.substring(0, 1) + fullStego + cover.substring(1);
+        } else {
+            finalText = fullStego;
+        }
+
+        // 4. Display Result
+        document.getElementById('hide-output').value = finalText;
+        showToast("Message hidden successfully!");
+    }
+
+    function revealMessage() {
+        const stegoText = document.getElementById('reveal-input').value;
+        let extractedBinary = "";
+        let isRecording = false;
+
+        // Parse through text looking for markers
+        for (let char of stegoText) {
+            if (char === ZW_JOINER) {
+                if (!isRecording) {
+                    isRecording = true; // Found Start Marker
+                } else {
+                    break; // Found End Marker
+                }
+            } else if (isRecording) {
+                if (char === ZW_ZERO) {
+                    extractedBinary += '0';
+                } else if (char === ZW_ONE) {
+                    extractedBinary += '1';
+                }
+            }
+        }
+
+        const outputSpan = document.getElementById('reveal-output');
+        const outputContainer = document.getElementById('reveal-output-container');
+        
+        if (extractedBinary.length > 0) {
+            const decodedMsg = binaryToStr(extractedBinary);
+            outputSpan.textContent = decodedMsg;
+            outputSpan.classList.remove('italic', 'text-slate-400');
+            outputSpan.classList.add('font-bold', 'text-emerald-800');
+            outputContainer.classList.add('bg-emerald-100', 'border-emerald-300');
+        } else {
+            outputSpan.textContent = "No hidden message found in this text.";
+            outputSpan.classList.add('italic', 'text-slate-500');
+            outputSpan.classList.remove('font-bold', 'text-emerald-800');
+            outputContainer.classList.remove('bg-emerald-100', 'border-emerald-300');
+            outputContainer.classList.add('bg-slate-50', 'border-slate-200');
+        }
+    }
+
+    // --- UI Helpers ---
+
+    function copyToClipboard() {
+        const text = document.getElementById('hide-output').value;
+        if (!text) {
+            showToast("Nothing to copy!", true);
+            return;
+        }
+        
+        // Use modern clipboard API first, fallback to execCommand if needed
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Copied to clipboard!");
+            }).catch(err => {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast("Copied to clipboard!");
+        } catch (err) {
+            showToast("Failed to copy", true);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        const toastMsg = document.getElementById("toast-msg");
+        
+        toastMsg.innerText = message;
+        
+        if (isError) {
+            toast.querySelector('svg').classList.remove('text-emerald-400');
+            toast.querySelector('svg').classList.add('text-red-400');
+        } else {
+            toast.querySelector('svg').classList.add('text-emerald-400');
+            toast.querySelector('svg').classList.remove('text-red-400');
+        }
+
+        toast.classList.remove('opacity-0');
+        setTimeout(() => {
+            toast.classList.add('opacity-0');
+        }, 3000);
+    }
+</script>
+</body>
+</html>
