@@ -77,7 +77,8 @@ class SteganographyApp:
 
         # Output
         ttk.Label(frame, text="Hidden Message Found:").pack(anchor="w")
-        self.reveal_output = tk.Entry(frame, font=("Segoe UI", 12, "bold"), fg="#2e7d32")
+        # CHANGED: Replaced Entry with Text widget and added height
+        self.reveal_output = tk.Text(frame, height=5, font=("Segoe UI", 12, "bold"), fg="#2e7d32", wrap="word")
         self.reveal_output.pack(fill="x", pady=5)
 
     # --- Core Logic ---
@@ -157,13 +158,14 @@ class SteganographyApp:
                 elif char == self.ZW_ONE:
                     extracted_binary += '1'
         
-        self.reveal_output.delete(0, tk.END)
+        # CHANGED: Updated delete/insert indices for Text widget ("1.0" instead of 0)
+        self.reveal_output.delete("1.0", tk.END)
         
         if extracted_binary:
             decoded_msg = self.binary_to_str(extracted_binary)
-            self.reveal_output.insert(0, decoded_msg)
+            self.reveal_output.insert("1.0", decoded_msg)
         else:
-            self.reveal_output.insert(0, "No hidden message found.")
+            self.reveal_output.insert("1.0", "No hidden message found.")
 
     def copy_to_clipboard(self):
         # FIX: Use "end-1c" to get EXACT text (prevents missing chars at boundaries)
