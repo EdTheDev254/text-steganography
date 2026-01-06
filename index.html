@@ -223,13 +223,17 @@
         let extractedBinary = "";
         let isRecording = false;
 
-        // Go through text to find the zero-width "sandwich"
+        // Define BOTH markers
+        const OLD_MARKER = '\u200d'; // The one used in Python/YouTube comments
+        const NEW_MARKER = '\uFEFF'; // The new one for the Web
+
         for (const char of text) {
-            if (char === MARKER) {
+            // Check if the character is EITHER the Old or New marker
+            if (char === OLD_MARKER || char === NEW_MARKER) {
                 if (!isRecording) {
-                    isRecording = true; 
+                    isRecording = true; // Found Start
                 } else {
-                    break; 
+                    break; // Found End
                 }
             } else if (isRecording) {
                 if (char === ZW_ZERO) {
@@ -247,13 +251,12 @@
                 const decodedMsg = binaryToStr(extractedBinary);
                 outputBox.value = decodedMsg;
             } catch (e) {
-                outputBox.value = "Error decoding message.";
+                outputBox.value = "Error: Could not decode message.";
             }
         } else {
             outputBox.value = "No hidden message found.";
         }
     });
-
 
 </script>
 </html>
