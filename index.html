@@ -158,7 +158,7 @@
         if (!secret || !cover) {
             alert("Please enter both secret and cover text.");
             return;
-            
+
         }
 
         const binarySecret = strToBinary(secret);
@@ -197,5 +197,60 @@
             alert("Copied to clipboard!");
         });
     });
+
+
+        function binaryToStr(binary) {
+        const byteArray = [];
+        // Split binary string into 8-bit chunks
+        for (let i = 0; i < binary.length; i += 8) {
+            const byte = binary.slice(i, i + 8);
+            if (byte.length === 8) {
+                byteArray.push(parseInt(byte, 2));
+            }
+        }
+        // Convert byte array back to string using TextDecoder (UTF-8)
+        const decoder = new TextDecoder();
+        return decoder.decode(new Uint8Array(byteArray));
+    }
+
+    //  Reveal Button Logic
+    document.getElementById('revealBtn').addEventListener('click', function() {
+        const text = document.getElementById('revealInput').value;
+        
+        let extractedBinary = "";
+        let isRecording = false;
+
+        // Go through text to find the zero-width "sandwich"
+        for (const char of text) {
+            if (char === ZW_JOINER) {
+                if (!isRecording) {
+                    isRecording = true; 
+                } else {
+                    break; 
+                }
+            } else if (isRecording) {
+                if (char === ZW_ZERO) {
+                    extractedBinary += '0';
+                } else if (char === ZW_ONE) {
+                    extractedBinary += '1';
+                }
+            }
+        }
+
+        const outputBox = document.getElementById('revealOutput');
+
+        if (extractedBinary.length > 0) {
+            try {
+                const decodedMsg = binaryToStr(extractedBinary);
+                outputBox.value = decodedMsg;
+            } catch (e) {
+                outputBox.value = "Error decoding message.";
+            }
+        } else {
+            outputBox.value = "No hidden message found.";
+        }
+    });
+
+
 </script>
 </html>
