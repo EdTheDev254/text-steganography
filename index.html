@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invisible Text Steganography</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+  
+
+        .container {
+            background-color: white;
+            width: 600px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+
+
+        }
+
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #444;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+
+
+        }
+
+        button {
+            background-color: #e1e1e1;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 5px;
+
+            
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #d4d4d4;
+        }
+
+        .result-box {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .reveal-result {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Invisible Text Steganography</h1>
+
+        <div class="section">
+            <div class="section-title">Hide a Secret</div>
+            
+            <label for="secretInput">1. Secret Message (Emojis supported):</label>
+            <input type="text" id="secretInput" placeholder="Enter secret here...">
+
+            <label for="coverInput">2. Cover Text (Visible to everyone):</label>
+            <input type="text" id="coverInput" placeholder="Enter visible text here...">
+
+            <button type="button" id="hideBtn">Hide Message Inside Text</button>
+
+            <label for="hideOutput">Result (Copy this):</label>
+            <textarea id="hideOutput" class="result-box" rows="4" readonly></textarea>
+            
+            <button type="button" id="copyBtn">Copy Result to Clipboard</button>
+        </div>
+
+
+
+    </div>
+
+</body>
+</html>
