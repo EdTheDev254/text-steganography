@@ -136,7 +136,8 @@
     // variables
     const ZW_ZERO = '\u200b';
     const ZW_ONE = '\u200c';
-    const ZW_JOINER = '\u200d';
+    //const ZW_JOINER = '\u200d';
+    const MARKER = '\uFEFF'; 
 
 
     function strToBinary(text) {
@@ -168,7 +169,9 @@
             hiddenPayload += (bit === '0' ? ZW_ZERO : ZW_ONE);
         }
 
-        const fullStego = ZW_JOINER + hiddenPayload + ZW_JOINER;
+        //const fullStego = ZW_JOINER + hiddenPayload + ZW_JOINER;
+
+        const fullStego = MARKER + hiddenPayload + MARKER;
         
         let finalText;
         // Use spread syntax [...cover] to correctly handle emojis at the start of the string
@@ -222,7 +225,7 @@
 
         // Go through text to find the zero-width "sandwich"
         for (const char of text) {
-            if (char === ZW_JOINER) {
+            if (char === MARKER) {
                 if (!isRecording) {
                     isRecording = true; 
                 } else {
