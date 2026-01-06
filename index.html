@@ -130,4 +130,72 @@
     </div>
 
 </body>
+
+<script>
+
+    // variables
+    const ZW_ZERO = '\u200b';
+    const ZW_ONE = '\u200c';
+    const ZW_JOINER = '\u200d';
+
+
+    function strToBinary(text) {
+
+
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(text);
+        let binary = '';
+        for (let byte of bytes) {
+            binary += byte.toString(2).padStart(8, '0');
+        }
+        return binary;
+    }
+
+    document.getElementById('hideBtn').addEventListener('click', function() {
+        const secret = document.getElementById('secretInput').value;
+        const cover = document.getElementById('coverInput').value;
+
+        if (!secret || !cover) {
+            alert("Please enter both secret and cover text.");
+            return;
+            
+        }
+
+        const binarySecret = strToBinary(secret);
+        let hiddenPayload = "";
+
+        for (let bit of binarySecret) {
+            hiddenPayload += (bit === '0' ? ZW_ZERO : ZW_ONE);
+        }
+
+        const fullStego = ZW_JOINER + hiddenPayload + ZW_JOINER;
+        
+        let finalText;
+        // Use spread syntax [...cover] to correctly handle emojis at the start of the string
+        const coverChars = [...cover];
+        
+        if (coverChars.length > 0) {
+            finalText = coverChars[0] + fullStego + coverChars.slice(1).join('');
+        } else {
+            finalText = fullStego;
+        }
+
+        document.getElementById('hideOutput').value = finalText;
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', function() {
+        const output = document.getElementById('hideOutput');
+        if (!output.value) return;
+
+        navigator.clipboard.writeText(output.value).then(() => {
+            alert("Copied to clipboard!");
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+
+            output.select();
+            document.execCommand('copy');
+            alert("Copied to clipboard!");
+        });
+    });
+</script>
 </html>
