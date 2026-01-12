@@ -22,7 +22,8 @@ class SteganographyApp:
         # We use these to encode the binary data invisible to the eye
         self.ZW_ZERO = '\u200b'  # Zero Width Space (Binary 0)
         self.ZW_ONE = '\u200c'   # Zero Width Non-Joiner (Binary 1)
-        self.ZW_JOINER = '\u200d' # Zero Width Joiner (Start/End Marker)
+        self.ZW_JOINER = '\u200d' # Zero Width Joiner (Old Marker)
+        self.MARKER = '\uFEFF'    # NEW MARKER (Web Version) - problem with web formatting fix
 
         # Tabs
         tab_control = ttk.Notebook(root)
@@ -78,15 +79,16 @@ class SteganographyApp:
         # Output
         ttk.Label(frame, text="Hidden Message Found:").pack(anchor="w")
         # CHANGED: Replaced Entry with Text widget and added height
+
         self.reveal_output = tk.Text(frame, height=5, font=("Segoe UI", 12, "bold"), fg="#2e7d32", wrap="word")
         self.reveal_output.pack(fill="x", pady=5)
 
-    # --- Core Logic ---
-
+    # --- Core Logic ------------------------------------------------------
     def str_to_binary(self, text):
         """Converts string to binary using UTF-8 encoding (supports emojis)."""
         # Encode to bytes first to handle special chars correctly
         bytes_data = text.encode('utf-8')
+
         # Convert bytes to a long string of bits
         binary_string = ''.join(format(byte, '08b') for byte in bytes_data)
         return binary_string
@@ -114,10 +116,10 @@ class SteganographyApp:
             messagebox.showwarning("Missing Info", "Please enter both secret and cover text.")
             return
 
-        # 1. Convert secret to binary (UTF-8 safe)
+        # Convert secret to binary (UTF-8 safe)
         binary_secret = self.str_to_binary(secret)
 
-        # 2. Convert to Zero-Width Chars
+        # Convert to Zero-Width Chars
         hidden_payload = ""
         for bit in binary_secret:
             if bit == '0':
@@ -125,16 +127,16 @@ class SteganographyApp:
             else:
                 hidden_payload += self.ZW_ONE
         
-        # 3. Inject: [JOINER] + [PAYLOAD] + [JOINER]
-        # We put it after the first character of the cover text
-        full_stego = self.ZW_JOINER + hidden_payload + self.ZW_JOINER
+        # Inject: [MARKER] + [PAYLOAD] + [MARKER] - for web comp!!!
+        # UPDATED: Now uses self.MARKER (the web version's marker) for output
+        full_stego = self.MARKER + hidden_payload + self.MARKER
         
         if len(cover) > 0:
             final_text = cover[:1] + full_stego + cover[1:]
         else:
             final_text = full_stego
 
-        # 4. Display Result
+        #Display Result
         self.hide_output.delete("1.0", tk.END)
         self.hide_output.insert("1.0", final_text)
 
@@ -147,7 +149,8 @@ class SteganographyApp:
         
         # Parse through the text to find the zero-width sandwich
         for char in stego_text:
-            if char == self.ZW_JOINER:
+            # UPDATED: Checks for EITHER the old marker (ZW_JOINER) OR the new web marker (MARKER)
+            if char == self.ZW_JOINER or char == self.MARKER:
                 if not is_recording:
                     is_recording = True # Found Start
                 else:
