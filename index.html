@@ -129,9 +129,11 @@
 
 <script>
     // --- Constants matching Python Logic ---
-    const ZW_ZERO = '\u200b';   // Zero Width Space
-    const ZW_ONE = '\u200c';    // Zero Width Non-Joiner
-    const ZW_JOINER = '\u200d'; // Zero Width Joiner
+    const ZW_ZERO = '\u200b';    // Zero Width Space
+    const ZW_ONE = '\u200c';     // Zero Width Non-Joiner
+    const ZW_JOINER = '\u200d';  // Zero Width Joiner (legacy, for decoding only)
+    const ZW_MARKER = '\uFEFF';  // BOM Marker (matches Python's MARKER)
+
 
     // --- Tab Switching Logic ---
     function switchTab(tabName) {
@@ -218,7 +220,9 @@
         }
 
         // 3. Inject: [JOINER] + [PAYLOAD] + [JOINER]
-        const fullStego = ZW_JOINER + hiddenPayload + ZW_JOINER;
+        //const fullStego = ZW_JOINER + hiddenPayload + ZW_JOINER;
+        
+        const fullStego = ZW_MARKER + hiddenPayload + ZW_MARKER; // update
 
         let finalText = "";
         // Python Logic: final_text = cover[:1] + full_stego + cover[1:]
@@ -241,7 +245,7 @@
 
         // Parse through text looking for markers
         for (let char of stegoText) {
-            if (char === ZW_JOINER) {
+            if (char === ZW_JOINER || char === ZW_MARKER) {
                 if (!isRecording) {
                     isRecording = true; // Found Start Marker
                 } else {
